@@ -1,0 +1,2 @@
+class NotSupportedCarType(ValueError):
+  pass
