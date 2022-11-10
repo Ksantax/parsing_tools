@@ -2,15 +2,18 @@ import aiohttp
 from errors import BadResponseStatus
 from tools import CarType
 from typing import Callable
+from fake_headers import Headers
 
 
 class Requester:
+  # TODO: 
   session: aiohttp.ClientSession
+  headers = Headers()
   def __init__(self):
     self.session = aiohttp.ClientSession()
   
   async def get(self, url:str) -> str:
-    async with self.session.get(url) as response:
+    async with self.session.get(url, headers=self.headers.generate()) as response:
       if response.status != 200:
         raise BadResponseStatus('Got not 200 response status while getting: '+url)
       return await response.text()
