@@ -97,32 +97,16 @@ class DromScrollingParser(Parser):
     )
   
   def __get_price(self, soup:bs4.BeautifulSoup):
-    return soup.select_one('div.css-eazmxc.e162wx9x0').text.replace('\xa0', ' ')
+    pass
 
   def __get_date(self, soup:bs4.BeautifulSoup):
-    return soup.select_one('div.css-pxeubi.evnwjo70').text.split()[-1]
+    pass
 
   def __get_properties(self, soup:bs4.BeautifulSoup):
-    props = dict()
-    param_names = soup.select('th.css-16lvhul.ezjvm5n1')
-    param_values = soup.select('td.css-9xodgi.ezjvm5n0')
-    for n, v in zip(param_names, param_values):
-      if v.text is None:
-        if v.find('span') is not None:
-          v = v.find('span')
-        else:
-          v = v.find('a')
-      v_text = v.text
-      if 'Мощность' in n.text:
-        v_text = v_text.split(',')[0]
-      v_text.replace('\xa0', ' ')
-      props[n.text] = v_text
-    return props
+    pass
 
   def __get_text(self, soup:bs4.BeautifulSoup):
-    return self.__get_title(soup)+'\n\n'+\
-           self.__get_main_text(soup)+'\n\n'+\
-           self.__get_green_checks(soup)
+    pass
   
   def get_page_count(self, list_page_text:str) -> int:
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')

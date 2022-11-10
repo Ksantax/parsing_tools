@@ -6,7 +6,7 @@ from fake_headers import Headers
 
 
 class Requester:
-  # TODO: 
+  # TODO: Make session objec global for application
   session: aiohttp.ClientSession
   headers = Headers()
   def __init__(self):
