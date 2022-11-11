@@ -12,3 +12,5 @@ Run in terminal:
     poetry install
     cd code
     uvicorn rest:app
+
+After that make POST request by url "localhost:8000/init_app"
