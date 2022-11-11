@@ -38,7 +38,8 @@ def _parse_region(region_div:bs4.element.Tag) -> dict[str: str]:
   region_name = region_div.select_one('a').text.strip().lower()
   for a in region_div.find_next('noscript').select('a'):
     if 'region' not in a.get('href'):
-      resault[f'{region_name}>{a.text.strip().lower()}'] = a.get('href')
+      city = a.get('href').split('/')[2].split('.')[0]
+      resault[f'{region_name}>{a.text.strip().lower()}'] = city
   return resault
 
 

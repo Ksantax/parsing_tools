@@ -1,20 +1,49 @@
-from selenium import webdriver
-from time import sleep
-import bs4
-
-# driver = webdriver.Chrome(executable_path='C:\\Programming\\VITYAZ\\parsing_tools\\chromedriver\\chromedriver.exe')
-# driver.get('https://moto.drom.ru/bodaibo/sale/')
-
-# sleep(20)
-
-# with open('static\\_temp.html', 'w+', encoding="utf-8") as file:
-#   file.write(driver.page_source)
-
-with open('static\\_temp.html', 'r', encoding="utf-8") as file:
-  html = file.read()
+from collecting import DromPostCollector
+from tools import CarType
+import json
+import aiohttp
+import asyncio
 
 
-soup = bs4.BeautifulSoup(html, 'lxml')
+async def main():
+  async with aiohttp.ClientSession() as session:
+    collector = DromPostCollector(session)
+    posts = await collector.collect_posts('zalari', CarType.SPEC)
+    posts = list(map(lambda x: x.as_dict(), posts))
+    with open('static\\zalari.spec.json', 'w+', encoding='utf-8') as file:
+      json.dump(posts, file, ensure_ascii=False, indent=4)
+    del posts
+
+    posts = await collector.collect_posts('atagay', CarType.SPEC)
+    posts = list(map(lambda x: x.as_dict(), posts))
+    with open('static\\atagay.spec.json', 'w+', encoding='utf-8') as file:
+      json.dump(posts, file, ensure_ascii=False, indent=4)
+    del posts
+
+    posts = await collector.collect_posts('alzamay', CarType.SPEC)
+    posts = list(map(lambda x: x.as_dict(), posts))
+    with open('static\\alzamay.spec.json', 'w+', encoding='utf-8') as file:
+      json.dump(posts, file, ensure_ascii=False, indent=4)
+    del posts
+
+    posts = await collector.collect_posts('bohan', CarType.AUTO)
+    posts = list(map(lambda x: x.as_dict(), posts))
+    with open('static\\bohan.auto.json', 'w+', encoding='utf-8') as file:
+      json.dump(posts, file, ensure_ascii=False, indent=4)
+    del posts
+
+    posts = await collector.collect_posts('alzamay', CarType.AUTO)
+    posts = list(map(lambda x: x.as_dict(), posts))
+    with open('static\\alzamay.auto.json', 'w+', encoding='utf-8') as file:
+      json.dump(posts, file, ensure_ascii=False, indent=4)
+    del posts
+
+    posts = await collector.collect_posts('artemovskiy-irk', CarType.AUTO)
+    posts = list(map(lambda x: x.as_dict(), posts))
+    with open('static\\artemovskiy-irk.auto.json', 'w+', encoding='utf-8') as file:
+      json.dump(posts, file, ensure_ascii=False, indent=4)
+    del posts  
 
 
-print([a.get('href') for a in soup.select('tbody.native tr:not([data-accuracy]) a.bulletinLink')], sep='\n')
+if __name__ == '__main__':
+  asyncio.run(main())
