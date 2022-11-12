@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import service
 from tools import CarType
 
+
 app = FastAPI()
 
 
