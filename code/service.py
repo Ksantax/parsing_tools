@@ -13,7 +13,11 @@ SESSION:aiohttp.ClientSession = None
 
 
 async def get_posts(city:str, car_type:CarType) -> Generator[list[dict], tuple[str, CarType], None]:
-  global COLLECTORS
+  global COLLECTORS, SESSION
+  if not SESSION:
+    SESSION = aiohttp.ClientSession()
+    asyncio_atexit.register(SESSION.close)
+    reload_config()
   try:
     response = []
     for collector in COLLECTORS:
@@ -22,16 +26,6 @@ async def get_posts(city:str, car_type:CarType) -> Generator[list[dict], tuple[s
     return response
   except Exception:
     return []
-
-
-async def init_app():
-  global SESSION
-  if SESSION:
-    SESSION.close()
-  SESSION = aiohttp.ClientSession()
-  asyncio_atexit.register(SESSION.close)
-  reload_config()
-  await asyncio.sleep(0)
 
 
 def reload_config() -> None:

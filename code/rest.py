@@ -6,11 +6,6 @@ from tools import CarType
 app = FastAPI()
 
 
-@app.post("/init_app")
-async def init_app():
-  await service.init_app()
-
-
 @app.post("/reload_config")
 def reload_config():
   service.reload_config()
