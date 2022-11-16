@@ -1,5 +1,5 @@
 import bs4
-from tools import CarType, Post
+from .tools import Post
 import math
 
 

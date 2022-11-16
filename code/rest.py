@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-import service
-from tools import CarType
+from .tools import CarType
+from . import service 
 
 
 app = FastAPI()

@@ -1,11 +1,10 @@
 import aiohttp
-from collecting import PostCollector
 from typing import Generator
-from tools import CarType
+from .tools import CarType
+from .collecting import PostCollector
 from importlib import reload
-import config
+from . import config
 import asyncio_atexit
-import asyncio
 
 
 COLLECTORS:list[PostCollector] = []

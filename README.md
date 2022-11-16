@@ -1,16 +1,16 @@
 # parsing_tools
 
-requires python 3.11.0
+requires docker
 
 Run in terminal:
     
     git clone https://github.com/Ksantax/parsing_tools.git
     cd parsing_tools
-    py -m venv venv
-    venv\Scripts\activate
-    pip install poetry
-    poetry install
-    cd code
-    uvicorn rest:app
+    docker build -t pt_image .
+    docker run -d -p 8000:8000 --name parsing_tools pt_image
 
-After that make POST request by url "localhost:8000/init_app"
+Now, the application is avalable on adress `localhost:8000`
+
+Example:
+
+    localhost:8000\posts\?city=alzamay&car_type=auto

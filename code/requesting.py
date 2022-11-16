@@ -1,6 +1,6 @@
 import aiohttp
-from errors import BadResponseStatus
-from tools import CarType
+from .errors import BadResponseStatus
+from .tools import CarType
 from typing import Callable
 from fake_headers import Headers
 

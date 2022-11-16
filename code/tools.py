@@ -27,6 +27,6 @@ class Post:
 
 
 class CarType(Enum):
-  AUTO = "Легковое авто"
-  SPEC = "Спецтехника/Грузовики"
-  MOTO = "Мотоцикты"
+  AUTO = "auto"
+  SPEC = "spec"
+  MOTO = "moto"

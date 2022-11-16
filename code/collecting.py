@@ -1,7 +1,7 @@
-from parsing import Parser, DromParser, DromPagingParser, DromScrollingParser
-from requesting import Requester, DromRequester
-from tools import CarType, Post
-from errors import NotSupportedCarType
+from .parsing import Parser, DromParser, DromPagingParser, DromScrollingParser
+from .requesting import Requester, DromRequester
+from .tools import CarType, Post
+from .errors import NotSupportedCarType
 from typing import Generator, Callable
 import aiohttp
 

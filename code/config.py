@@ -1,3 +1,3 @@
-from collecting import DromPostCollector
+from .collecting import DromPostCollector
 
 collectors = [DromPostCollector]
