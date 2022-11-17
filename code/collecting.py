@@ -60,13 +60,10 @@ class DromPostCollector(PostCollector):
     self.requester = DromRequester(session)
 
   async def get_post_urls(self, city:str, car_type:CarType) -> AsyncGenerator[str, None]:
-    get_page:Callable[[int], str] = self.requester.get_pager(city, car_type)
-    parser = self.parsers[car_type]
-    total_pages = 2 if car_type is CarType.MOTO else 5
-    total_pages = min(total_pages, parser.get_page_count(await get_page(1)))
-    for i in range(total_pages):
+    get_page:Callable[[int], str] = self.requester.get_pager(city, car_type)    
+    for i in range(self.parsers[car_type].get_page_count(await get_page(1))):
       list_page_content = await get_page(i+1)
-      for url in parser.parse_list(list_page_content):
+      for url in self.parsers[car_type].parse_list(list_page_content):
         yield url
   
   def reduce_urls(self, urls: Iterable[str], city: str, car_type: CarType) -> Iterable[str]:
