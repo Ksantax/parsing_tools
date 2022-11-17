@@ -86,8 +86,11 @@ class DromPagingParser(DromParser):
 
   def get_page_count(self, list_page_text:str) -> int:
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')
-    tag = soup.find('div', id='tabs')
-    return math.ceil((int(tag.text.split()[0]) if tag else 0) / self.POST_PER_PAGE)
+    tag = soup.select_one('div#tabs div.css-1ksi09z.e1hsrrag2')
+    if tag:
+      total_posts = ''.join([num for num in tag.text.split() if num.isdigit()])
+      return math.ceil(int(total_posts) / self.POST_PER_PAGE)
+    return 0
   
   def parse_list(self, list_page_text:str) -> list[str]:
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')

@@ -3,7 +3,7 @@ from .requesting import Requester, DromRequester
 from collections import defaultdict
 from .tools import CarType, Post
 from .errors import NotSupportedCarType
-from typing import Generator, Callable, Iterable
+from typing import AsyncGenerator, Callable, Iterable
 import aiohttp
 from pathlib import Path
 import os
@@ -20,12 +20,10 @@ class PostCollector:
   def __init__(self, session:aiohttp.ClientSession):
     self.requester = Requester(session)
 
-  async def collect_posts(self, city:str, car_type:CarType) -> Generator[Post, None, None]:
+  async def collect_posts(self, city:str, car_type:CarType) -> AsyncGenerator[Post, None]:
     if car_type not in self.parsers:
       raise NotSupportedCarType
-    urls = []
-    async for url in await self.get_post_urls(city, car_type):
-      urls.append(url)
+    urls = [url async for url in self.get_post_urls(city, car_type)]
     for url in self.reduce_urls(urls, city, car_type):
       yield self.parsers[car_type](await self.requester.get(url)).add_link(url)
   
@@ -36,7 +34,7 @@ class PostCollector:
     cache_file.write_text('\n'.join(urls))
     return set(urls) - set(old_urlrs)
 
-  async def get_post_urls(self, city:str, car_type:CarType):
+  async def get_post_urls(self, city:str, car_type:CarType) -> AsyncGenerator[str, None]:
     raise NotImplementedError
 
 
@@ -61,11 +59,12 @@ class DromPostCollector(PostCollector):
     }
     self.requester = DromRequester(session)
 
-  async def get_post_urls(self, city:str, car_type:CarType) -> Generator[str, None, None]:
-    return self.__get_urls_by_pager(self.parsers[car_type], self.requester.get_pager(city, car_type))
-    
-  async def __get_urls_by_pager(self, parser:DromParser, get_page:Callable[[str, int], str]) -> Generator[str, None, None]: 
-    for i in range(parser.get_page_count(await get_page(1))):
+  async def get_post_urls(self, city:str, car_type:CarType) -> AsyncGenerator[str, None]:
+    get_page:Callable[[int], str] = self.requester.get_pager(city, car_type)
+    parser = self.parsers[car_type]
+    total_pages = 2 if car_type is CarType.MOTO else 5
+    total_pages = min(total_pages, parser.get_page_count(await get_page(1)))
+    for i in range(total_pages):
       list_page_content = await get_page(i+1)
       for url in parser.parse_list(list_page_content):
         yield url

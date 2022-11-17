@@ -16,12 +16,8 @@ async def get_posts(city:str, car_type:CarType) -> Generator[list[dict], tuple[s
     SESSION = aiohttp.ClientSession()
     asyncio_atexit.register(SESSION.close)
     COLLECTORS = [cl(SESSION) for cl in COLLECTOR_CLASSES]
-  try:
-    response = []
-    for collector in COLLECTORS:
-      async for post in collector.collect_posts(city, car_type):
-        response.append(post.as_dict())
-    return response
-  except Exception as e:
-    print("ERROR:    "+str(e))
-    return []
+  response = []
+  for collector in COLLECTORS:
+    async for post in collector.collect_posts(city, car_type):
+      response.append(post.as_dict())
+  return response
