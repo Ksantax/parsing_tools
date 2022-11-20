@@ -10,7 +10,6 @@ class Parser:
   def parse_post(self, post_page_text:str) -> Post:
     raise NotImplementedError
   
-
   def __call__(self, post_page_text:str) -> Post:
     return self.parse_post(post_page_text)
 
@@ -135,9 +134,4 @@ class DromScrollingParser(DromParser):
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')
     tag_list = soup.select('tbody.native tr:not([data-accuracy]) a.bulletinLink')
     return ['https://moto.drom.ru'+a.get('href') for a in tag_list]
-
-
-
-
-  
 
