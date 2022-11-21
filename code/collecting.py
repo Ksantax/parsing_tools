@@ -9,8 +9,8 @@ from pathlib import Path
 import os
 
 
-MODULE_DIR = os.path.dirname(__file__) + '\\'
-CACHE_DIR = MODULE_DIR+'cache\\drom\\'
+MODULE_DIR = os.path.dirname(__file__) + '/'
+CACHE_DIR = MODULE_DIR+'cache/drom/'
 
 
 class PostCollector:
@@ -28,8 +28,11 @@ class PostCollector:
       yield self.parsers[car_type](await self.requester.get(url)).add_link(url)
   
   def reduce_urls(self, urls:Iterable[str], city:str, car_type:CarType) -> Iterable[str]:
-    cache_file = Path(CACHE_DIR+f'{city}\\{car_type.value}.txt')
-    cache_file.parent.mkdir(exist_ok=True, parents=True)
+    cache_file = Path(CACHE_DIR+f'{city}/{car_type.value}.txt')
+    if not os.path.exists(cache_file):
+      cache_file.parent.mkdir(exist_ok=True, parents=True)
+      with open(cache_file, 'w+', encoding='utf-8') as file:
+        file.write('')
     old_urlrs = cache_file.read_text().splitlines()
     cache_file.write_text('\n'.join(urls))
     return set(urls) - set(old_urlrs)
@@ -65,12 +68,3 @@ class DromPostCollector(PostCollector):
       list_page_content = await get_page(i+1)
       for url in self.parsers[car_type].parse_list(list_page_content):
         yield url
-  
-  def reduce_urls(self, urls: Iterable[str], city: str, car_type: CarType) -> Iterable[str]:
-    res = list()
-    for url in urls:
-      if url == self.__cache[city][car_type]:
-        break
-      res.append(url)
-    self.__cache[city][car_type] = next(iter(urls))
-    return res
