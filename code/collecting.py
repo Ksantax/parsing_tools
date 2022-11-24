@@ -55,7 +55,7 @@ class PagingPostCollector(PostCollector):
 
   def __init__(self, cfg:PagingCfg):
     self.parsers = cfg.parsers
-    self.requester = PagingRequester(cfg.links)
+    self.requester = PagingRequester(cfg)
     self.cache_file_name = cfg.source+'.txt'
     self.cities = json.loads(cfg.cities_file_path.read_text())
     self.delay_interval = cfg.delay_interval
@@ -66,7 +66,9 @@ class PagingPostCollector(PostCollector):
   async def get_post_urls(self, city:str, car_type:CarType) -> AsyncGenerator[str, None]:
     get_page:Callable[[int], str] = self.requester.get_pager(city, car_type)   
     url_counter = 0 
-    for i in range(self.parsers[car_type].get_page_count(await get_page(1))):      
+    for i in range(self.parsers[car_type].get_page_count(await get_page(1))):
+      if self.delay_interval:
+        await asyncio.sleep(random.uniform(*self.delay_interval))
       list_page_content = await get_page(i+1)
       urls_list = self.parsers[car_type].parse_list_page(list_page_content)[:POST_LIMIT - url_counter]
       url_counter += len(urls_list)

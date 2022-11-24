@@ -176,5 +176,6 @@ class AvitoParser(PaigingParser):
 
   def parse_list_page(self, list_page_text:str) -> list[str]:
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')
-    a_list:list[bs4.Tag] = soup.find_all('a', {'itemprop': 'url', 'data-marker': 'item-title'})
+    div = soup.find('div', {'data-marker': 'catalog-serp'})
+    a_list:list[bs4.Tag] = div.find_all('a', {'itemprop': 'url', 'data-marker': 'item-title'})
     return [f"https://www.avito.ru{a.get('href')}" for a in a_list]

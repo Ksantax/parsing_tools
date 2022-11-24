@@ -3,6 +3,7 @@ from .errors import BadResponseStatus, NotSupportedCarType
 from .tools import CarType
 from typing import Callable
 from fake_headers import Headers
+from .configurating import PagingCfg
 import asyncio_atexit
 from typing import Callable, TypeVar, ParamSpec
 T, P = TypeVar('T'), ParamSpec('P')
@@ -23,7 +24,8 @@ CIPHERS = ':'.join([
 
 class Requester:
   session: aiohttp.ClientSession = None
-  headers = Headers()
+  headers_generator = Headers(headers=True)
+  const_headers:dict[str, str] = None
 
   def inited(func: Callable[P, T]) -> Callable[P, T]:
     def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> T:
@@ -42,19 +44,27 @@ class Requester:
     return wrapper
 
   @inited
-  async def get(self, url:str, headers:dict[str, str]=None) -> str:
-    headers = headers or self.headers.generate()
-    async with self.session.get(url, headers=headers) as response:
+  async def get(self, url:str) -> str:
+    async with self.session.get(url, headers=self.headers) as response:
       if response.status != 200:
         raise BadResponseStatus(f'Got {response.status} response status while getting: '+url)
       return await response.text()
+  
+  @property
+  def headers(self):
+    headers = self.headers_generator.generate()
+    if self.const_headers:
+      for header, value in self.const_headers.items():
+        headers[header] = value
+    return headers
 
 
 class PagingRequester(Requester):
   links:dict[CarType, str]
 
-  def __init__(self, links:dict[CarType, str]):
-    self.links = links
+  def __init__(self, cfg:PagingCfg):
+    self.links = cfg.links
+    self.const_headers = cfg.headers
 
   def get_pager(self, city:str, car_type:CarType) -> Callable[[int], str]:
     if car_type not in self.links:

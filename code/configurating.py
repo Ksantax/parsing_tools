@@ -12,6 +12,7 @@ class PagingCfg(NamedTuple):
   cities_file_path:Path
   parsers_links:dict[CarType, tuple[Parser, link]]
   delay_interval:tuple[int] = None
+  headers:dict[str, str] = None
 
   @property
   def links(self) -> dict[CarType, link]:
