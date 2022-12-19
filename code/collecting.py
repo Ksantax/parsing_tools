@@ -21,19 +21,28 @@ class PostCollector:
   requester: Requester
   cities:dict[str, str]
   cache_file_name: str
+  name: str
   delay_interval:tuple[float] = None
 
   async def collect_posts(self, city:str, car_type:CarType) -> AsyncGenerator[Post, None]:
     if city not in self.cities:
-      return 
+      return
+    _city = city 
     city = self.cities[city]
     if car_type not in self.parsers:
       raise NotSupportedCarType(f'Not supported {car_type} for {type(self)} collector')
     urls = [url async for url in self.get_post_urls(city, car_type)]
-    for url in self.reduce_urls(urls, city, car_type):
+    for url in self.reduce_urls(urls, _city, car_type):
       if self.delay_interval:
         await asyncio.sleep(random.uniform(*self.delay_interval))
-      yield self.parsers[car_type](await self.requester.get(url)).add_link(url)
+      try:
+        print('Getting url form '+self.name)
+        page_text = await self.requester.get(url)
+        yield self.parsers[car_type](page_text).add_link(url)
+      except AttributeError:
+        print('>>>> Attr error')
+        (CACHE_DIR/'_temp.html').write_text(page_text, encoding='utf-8')
+        continue
   
   def reduce_urls(self, urls:Iterable[str], city:str, car_type:CarType) -> Iterable[str]:
     cache_file:Path = CACHE_DIR / city / car_type.value / self.cache_file_name
@@ -57,6 +66,7 @@ class PagingPostCollector(PostCollector):
     self.parsers = cfg.parsers
     self.requester = PagingRequester(cfg)
     self.cache_file_name = cfg.source+'.txt'
+    self.name = cfg.source
     self.cities = json.loads(cfg.cities_file_path.read_text())
     self.delay_interval = cfg.delay_interval
 

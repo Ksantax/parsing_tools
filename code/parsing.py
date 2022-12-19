@@ -16,7 +16,7 @@ class Parser:
       properties = self._get_properties(soup),
       source = self.source
     )
-  
+    
   def _get_price(self, soup:bs4.BeautifulSoup) -> str:
     raise NotImplementedError
 
@@ -132,8 +132,7 @@ class DromOldDesignParser(DromParser):
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')
     tag = soup.select_one('span#itemsCount_placeholder strong')
     if tag:
-      total_posts = ''.join([num for num in tag.text.split() if num.isdigit()])
-      return int(total_posts)
+      return int(''.join([c for c in tag.text if c.isdigit()]))
     return 0
 
   def parse_list_page(self, list_page_text:str) -> list[str]:
@@ -171,7 +170,7 @@ class AvitoParser(PaigingParser):
     soup = bs4.BeautifulSoup(list_page_text, 'lxml')
     tag = soup.find('span', {'data-marker': 'page-title/count'})
     if tag:
-      return int(tag.text)
+      return int(''.join([c for c in tag.text if c.isdigit()]))
     return 0
 
   def parse_list_page(self, list_page_text:str) -> list[str]:
